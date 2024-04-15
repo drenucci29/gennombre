@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Générateur de nombre aléatoire</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #000;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #ddd;
+      color: #333;
+      padding: 20px 0;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    header strong {
+      font-weight: bold;
+    }
+    #randomNumber {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #ffc107;
+      color: #000;
+      border: none;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #ffcd38;
+    }
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #f2f2f2;
+      margin-bottom: 10px;
+    }
+    select {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #f2f2f2;
+      margin-bottom: 10px;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 80%;
+      background-color: #fff;
+      color: #000;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .stats-box {
+      background-color: #000;
+      color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    footer {
+      background-color: #ddd;
+      color: #333;
+      padding: 10px 0;
+      width: 100%;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+    }
+    .warning-text {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><strong>Générateur de nombre aléatoire</strong></h1>
+  </header>
+  <br>
+  <div>
+    <label for="pseudo">Entrez votre pseudo :</label>
+    <br><br>
+    <input type="text" id="pseudo" name="pseudo">
+    <br>
+    <button onclick="validatePseudo()">Valider</button>
+    <br><br>
+  </div>
+  <div id="randomNumber">Cliquez sur le bouton pour générer un nombre aléatoire.</div>
+  <button onclick="generateRandomNumber()">Générer un nombre aléatoire</button>
+  <br><br>
+
+  <h2>Historique</h2>
+  <table id="history">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Résultat phrase</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+
+  <div id="scores"></div>
+
+  <br><br>
+
+  <div class="stats-box">
+    <h2>Statistiques</h2>
+    <p>Nombre de tentatives : <span id="totalAttempts">0</span></p>
+    <p>Nombre de réussites : <span id="successCount">0</span></p>
+    <p>Nombre d'échecs : <span id="failureCount">0</span></p>
+    <p>Pourcentage de réussites : <span id="successPercentage">0%</span></p>
+    <p>Pourcentage d'échecs : <span id="failurePercentage">0%</span></p>
+  </div>
+
+  <div class="warning-text">
+    <p>ATTENTION : Aucune donnée enregistrée. Toute progression sera perdue.</p>
+  </div>
+
+  <footer>
+    <p>Ce code a été généré avec ChatGPT. Tous droits réservés. © 2024. Site hébergé sur GitHub. Conçu par Damien Renucci. Propulsé par OpenAI.</p>
+  </footer>
+
+  <script>
+    var totalAttempts = 0;
+    var successCount = 0;
+    var failureCount = 0;
+    var scores = [];
+    var historyTable = document.getElementById("history").getElementsByTagName('tbody')[0];
+
+    function validatePseudo() {
+      var pseudo = document.getElementById("pseudo").value;
+      if (pseudo === "") {
+        alert("Veuillez entrer un pseudo !");
+        return;
+      }
+
+      document.getElementById("pseudo").disabled = true;
+    }
+
+    function generateRandomNumber() {
+      var pseudo = document.getElementById("pseudo").value;
+      if (pseudo === "") {
+        alert("Veuillez entrer un pseudo !");
+        return;
+      }
+
+      var randomNumber = Math.floor(Math.random() * 2000) + 1;
+      var resultPhrase = randomNumber > 1000 ? "Félicitations !" : "Essaie encore !";
+      
+      document.getElementById("randomNumber").textContent = "Nombre aléatoire : " + randomNumber;
+      
+      var newRow = historyTable.insertRow();
+      var cell1 = newRow.insertCell(0);
+      var cell2 = newRow.insertCell(1);
+      cell1.textContent = randomNumber;
+      cell2.textContent = resultPhrase;
+
+      // Mise à jour des statistiques
+      totalAttempts++;
+      if (randomNumber > 1000) {
+        successCount++;
+      } else {
+        failureCount++;
+      }
+
+      if (historyTable.rows.length > 10) {
+        historyTable.deleteRow(0); // Supprimer la première ligne (la plus ancienne)
+      }
+
+      updateStats();
+      saveScore(pseudo, resultPhrase);
+    }
+
+    function updateStats() {
+      document.getElementById("totalAttempts").textContent = totalAttempts;
+      document.getElementById("successCount").textContent = successCount;
+      document.getElementById("failureCount").textContent = failureCount;
+
+      var successPercentage = (successCount / totalAttempts * 100).toFixed(2);
+      var failurePercentage = (failureCount / totalAttempts * 100).toFixed(2);
+
+      document.getElementById("successPercentage").textContent = successPercentage + "%";
+      document.getElementById("failurePercentage").textContent = failurePercentage + "%";
+    }
+
+    function saveScore(pseudo, resultPhrase) {
+      var victories = 0;
+      var defeats = 0;
+      for (var i = 0; i < scores.length; i++) {
+        if (scores[i].pseudo === pseudo) {
+          if (resultPhrase === "Félicitations !") {
+            victories = scores[i].victories + 1;
+            defeats = scores[i].defeats;
+          } else {
+            victories = scores[i].victories;
+            defeats = scores[i].defeats + 1;
+          }
+          scores.splice(i, 1);
+          break;
+        }
+      }
+      scores.push({pseudo: pseudo, victories: victories, defeats: defeats});
+      displayScores();
+    }
+
+    function displayScores() {
+      var table = "<h2>Classement</h2><table><thead><tr><th>Pseudo</th><th>Victoires</th><th>Défaites</th><th>Ratio</th></tr></thead><tbody>";
+      for (var i = 0; i < scores.length; i++) {
+        var victories = scores[i].victories;
+        var defeats = scores[i].defeats;
+        var ratio = (victories / (defeats + victories) * 100).toFixed(2) + "%";
+        table += "<tr><td>" + scores[i].pseudo + "</td><td>" + victories + "</td><td>" + defeats + "</td><td>" + ratio + "</td></tr>";
+      }
+      table += "</tbody></table>";
+      document.getElementById("scores").innerHTML = table;
+    }
+  </script>
+</body>
+</html>
